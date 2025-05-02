@@ -78,12 +78,71 @@
       <script>for(let i=50;i<=65;i++)document.write(`<option>${i}</option>`);</script>
     </select>
 
-    <!-- Sekce: Osazení -->
+    <!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protokol RFS - Terénní zadání</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 1em; background: #f4f4f4; }
+    .container { background: white; padding: 1em; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 800px; margin: auto; }
+    label { display: block; margin-top: 1em; font-weight: bold; }
+    input, select { width: 100%; padding: 0.5em; margin-top: 0.3em; border-radius: 5px; border: 1px solid #ccc; }
+    button { margin-top: 1.5em; padding: 0.7em 1.5em; background: #007BFF; color: white; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .button-group { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5em; }
+    .section-title { margin-top: 2em; font-size: 1.2em; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.3em; }
+    .measurement-row { display: flex; gap: 1em; align-items: center; margin-top: 0.5em; }
+    .measurement-row label { flex: 1; margin: 0; }
+    .measurement-row input { flex: 2; }
+    .warning { border: 2px solid red; background: #ffe6e6; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Protokol RFS - Formulář</h2>
+    <!-- Sekce: Technické údaje -->
+    <!-- ... předchozí sekce ... -->
+
+    <!-- Sekce: Osazení modulů - ROZŠÍŘENO -->
     <div class="section-title">Osazení modulů</div>
     <label>Cable simulator (PAD)</label>
-    <select id="pad">
-      <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
-    </select>
+    <select id="pad"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select>
+
+    <label>Input attenuator (dB)</label>
+    <select id="inputAtt"><script>for(let i=0;i<=20;i++)document.write(`<option>${i}</option>`);</script></select>
+
+    <label>Input equalizer (dB)</label>
+    <select id="inputEq"><script>for(let i=0;i<=20;i++)document.write(`<option>${i}</option>`);</script></select>
+
+    <label>Interstage attenuator</label>
+    <select id="interstageAtt"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select>
+
+    <label>Slope</label>
+    <select id="slope"><script>for(let i=0;i<=10;i++)document.write(`<option>${i}</option>`);</script></select>
+
+    <label>AGC</label>
+    <select id="agc"><option>0</option><option>1</option></select>
+
+    <label>Return attenuator</label>
+    <select id="returnAtt"><script>for(let i=0;i<=20;i++)document.write(`<option>${i}</option>`);</script></select>
+
+    <label>Return equalizer</label>
+    <select id="returnEq"><script>for(let i=0;i<=20;i++)document.write(`<option>${i}</option>`);</script></select>
+
+    <label>Monitoring</label>
+    <select id="monitoring"><option>0</option><option>1</option></select>
+
+    <div class="button-group">
+      <button onclick="exportDataAsJSON()">💾 Exportovat JSON</button>
+      <button onclick="alert(generateFileName())">📥 Stáhnout XLSX</button>
+      <button>📄 Stáhnout PDF</button>
+    </div>
+  </div>
+</body>
+</html>
+
     <div class="button-group">
       <button onclick="exportDataAsJSON()">💾 Exportovat JSON</button>
       <button onclick="alert(generateFileName())">📥 Stáhnout XLSX</button>
