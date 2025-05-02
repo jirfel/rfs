@@ -20,7 +20,131 @@
   </style>
 </head>
 <body>
-  <!-- Content zůstává beze změny, přidán výše -->
-  <p style="text-align:center; font-style:italic;">(Zkráceno pro přehlednost, viz plná verze výše)</p>
+  <div class="container">
+    <h2>Protokol RFS - Formulář</h2>
+    <!-- Sekce: Technické údaje -->
+    <label>ID projektu</label>
+    <input type="text" value="N.85001255.020">
+    <label>Jméno technika</label>
+    <input type="text">
+    <label>Město</label>
+    <input type="text" id="city">
+    <label>Ulice</label>
+    <input type="text" id="street">
+    <label>Číslo popisné</label>
+    <input type="text">
+    <label>Číslo orientační</label>
+    <input type="text">
+    <label>Technologie</label>
+    <select>
+      <option>Delta LHD 43-1R</option>
+      <option>Delta LHD 43-R</option>
+      <option>Technetix DBC-1200 lite</option>
+      <option>Teleste AC3210</option>
+      <option>Teleste AC8810</option>
+    </select>
+    <button onclick="fetchLocationData()">Načíst část obce, GPS a RUIAN</button>
+    <label>Část obce</label>
+    <input type="text" id="suburb" readonly>
+    <label>GPS</label>
+    <input type="text" id="gps" readonly>
+    <label>RUIAN kód</label>
+    <input type="text" id="ruian" readonly>
+
+    <!-- Sekce: Měření -->
+    <div class="section-title">Měření signálu (IN / OUT)</div>
+    <div class="measurement-row">
+      <label>264 MHz</label>
+      <input type="number" placeholder="IN 70-90" onblur="checkRange(this, 70, 90)">
+      <input type="number" placeholder="OUT 95-110" onblur="checkRange(this, 95, 110)">
+    </div>
+    <div class="measurement-row">
+      <label>274 MHz</label>
+      <input type="number" placeholder="IN 70-90" onblur="checkRange(this, 70, 90)">
+      <input type="number" placeholder="OUT 95-110" onblur="checkRange(this, 95, 110)">
+    </div>
+    <div class="measurement-row">
+      <label>855,25 MHz</label>
+      <input type="number" placeholder="IN 70-90" onblur="checkRange(this, 70, 90)">
+      <input type="number" placeholder="OUT 95-110" onblur="checkRange(this, 95, 110)">
+    </div>
+    <div class="measurement-row">
+      <label>1186 MHz</label>
+      <input type="number" placeholder="IN 70-90" onblur="checkRange(this, 70, 90)">
+      <input type="number" placeholder="OUT 95-110" onblur="checkRange(this, 95, 110)">
+    </div>
+    <label>Napětí (V)</label>
+    <select>
+      <script>for(let i=50;i<=65;i++)document.write(`<option>${i}</option>`);</script>
+    </select>
+
+    <!-- Sekce: Osazení -->
+    <div class="section-title">Osazení modulů</div>
+    <label>Cable simulator (PAD)</label>
+    <select><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select>
+    <label>Input attenuator (dB)</label>
+    <select><script>for(let i=0;i<=20;i++)document.write(`<option>${i}</option>`);</script></select>
+    <label>Input equalizer (dB)</label>
+    <select><script>for(let i=0;i<=20;i++)document.write(`<option>${i}</option>`);</script></select>
+    <label>Interstage attenuator</label>
+    <select><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select>
+    <label>Slope</label>
+    <select><script>for(let i=0;i<=10;i++)document.write(`<option>${i}</option>`);</script></select>
+    <label>AGC</label>
+    <select><option>0</option><option>1</option></select>
+    <label>Return attenuator</label>
+    <select><script>for(let i=0;i<=20;i++)document.write(`<option>${i}</option>`);</script></select>
+    <label>Return equalizer</label>
+    <select><script>for(let i=0;i<=20;i++)document.write(`<option>${i}</option>`);</script></select>
+    <label>Monitoring</label>
+    <select><option>0</option><option>1</option></select>
+    <div class="button-group">
+      <button>📥 Stáhnout XLSX</button>
+      <button>📄 Stáhnout PDF</button>
+    </div>
+  </div>
+  <script>
+    async function fetchLocationData() {
+      const street = document.getElementById('street').value;
+      const city = document.getElementById('city').value;
+      const address = `${street}, ${city}, Česká republika`;
+
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&addressdetails=1`);
+      const data = await response.json();
+
+      if (data.length > 0) {
+        const lat = data[0].lat;
+        const lon = data[0].lon;
+        document.getElementById('gps').value = `${lat}, ${lon}`;
+        const suburb = data[0].address.suburb || data[0].address.city_district || '';
+        document.getElementById('suburb').value = suburb;
+
+        try {
+          const ruianRes = await fetch(`https://vdp.cuzk.cz/vdp/ruian/budovy/get-by-point.json?x=${lon}&y=${lat}`);
+          const ruianData = await ruianRes.json();
+          if (ruianData.budovy && ruianData.budovy.length > 0) {
+            document.getElementById('ruian').value = ruianData.budovy[0].kod;
+          } else {
+            document.getElementById('ruian').value = 'Nedostupné';
+          }
+        } catch (error) {
+          document.getElementById('ruian').value = 'Chyba dotazu';
+        }
+      } else {
+        alert('Adresa nenalezena. Zkontrolujte zadání.');
+      }
+    }
+
+    function checkRange(input, min, max) {
+      const value = parseFloat(input.value);
+      if (!isNaN(value) && (value < min || value > max)) {
+        input.classList.add("warning");
+        input.title = "MIMO ROZSAH";
+      } else {
+        input.classList.remove("warning");
+        input.title = "";
+      }
+    }
+  </script>
 </body>
 </html>
